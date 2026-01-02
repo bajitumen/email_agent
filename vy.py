@@ -1,0 +1,102 @@
+import pandas as pd
+import requests
+from datetime import datetime, timedelta
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from bs4 import BeautifulSoup
+import json
+import re
+import random
+import time
+from newsapi import NewsApiClient
+import pgeocode
+import os
+from dotenv import load_dotenv
+from functions import get_weather, send_email, get_news
+
+load_dotenv()
+news_key = os.getenv("NEWS_API_KEY")
+events_key = os.getenv("EVENTS_API_KEY")
+if news_key:
+    news_key = news_key.strip()
+if events_key:
+    events_key = events_key.strip()
+
+intros = {
+    "Huzzah, another day begins!": 10,
+    "Yippee! You're gonna have a great day.": 20,
+    "Let's gooooo, today's gonna be a good day.": 10,
+    "Let's get this day started!": 30,
+    "Hmm... did we snugabug today?": 5,
+    "It's gonna be a good day, I have a feeling.": 5,
+    "Your horoscope today is that you're gonna slay.": 5,
+    "You are so loved, but especially today!": 5
+}
+
+intros_list = list(intros.keys())
+weights = list(intros.values())
+
+intro = random.choices(intros_list, weights=weights, k=1)[0]
+
+weather_report = get_weather("90042")
+
+today = datetime.today()
+day_name = today.strftime('%A')
+
+terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", 
+         "climate change", "environmental justice", "beyonce", "sabrina carpenter", 
+         "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza"]
+
+sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine", 
+           "The New Yorker", "Al Jazeera English", "Mondoweiss", "CNN", "Democracy Now!", "Slate Magazine", "Billboard"]
+
+news_text = get_news(
+    terms=terms,
+    sources=sources,
+    news_key=news_key,
+    days_back=1,
+    max_articles=5
+)
+
+
+sender_email = "tumendemberelbaji@gmail.com"
+receiver_email = "tumendemberelbaji@gmail.com"
+subject = f"{today.strftime('%-m/%-d/%Y')}: Vy Newsletter"
+
+r = random.randint(200, 255)
+g = random.randint(200, 255)
+b = random.randint(200, 255)
+
+background_color = f'rgba({r}, {g}, {b}, 1)'
+
+dog_api_url = "https://dog.ceo/api/breeds/image/random"
+response = requests.get(dog_api_url, timeout=10)
+dog = response.json()["message"]
+
+body = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; padding: 40px 0;">
+        <div style="background-color: {background_color}; padding: 21px; margin: 0 auto; border-radius: 10px; max-width: 600px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: rgba(255, 255, 255, 0.7); padding: 20px; margin: 0 auto; border-radius: 10px; max-width: 600px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                <p style="font-size: 16px; color: #555555;"><b>Dearest Vy,</b></p>
+                <p style="font-size: 16px; color: #555555;">{intro}</p>
+                <p style="font-size: 16px; color: #555555;">{weather_report}</p>
+                <div style="font-size: 16px; color: #555555;">{news_text}</div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <img src="{dog}" style="max-width: 400px; border-radius: 10px;">
+                </div>
+                <p style="font-size: 16px; color: #555555; margin-left: 20px;">Love,<br>Baji &#x2764;</p>
+            </div>
+        </div>
+        </body>
+    </html>
+"""
+
+smtp_server = "smtp.gmail.com"
+smtp_port = 587
+# Load SMTP credentials from environment (set as GitHub Secrets for Actions)
+login = os.getenv("SMTP_LOGIN")
+password = os.getenv("SMTP_PASSWORD")
+
+send_email(sender_email, receiver_email, subject, body, smtp_server, smtp_port, login, password)
