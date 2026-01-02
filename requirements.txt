@@ -1,0 +1,6 @@
+pandas
+requests
+python-dotenv
+newsapi-python
+pgeocode
+beautifulsoup4
