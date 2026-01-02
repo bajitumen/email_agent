@@ -95,7 +95,7 @@ body = f"""
 
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
-# Load SMTP credentials from environment (set as GitHub Secrets for Actions)
+
 login = os.getenv("SMTP_LOGIN")
 password = os.getenv("SMTP_PASSWORD")
 
