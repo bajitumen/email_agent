@@ -61,7 +61,7 @@ news_text = get_news(
 
 
 sender_email = "tumendemberelbaji@gmail.com"
-receiver_email = "tumendemberelbaji@gmail.com"
+receiver_email = "vy.tran27@gmail.com"
 subject = f"{today.strftime('%-m/%-d/%Y')}: Vy Newsletter"
 
 r = random.randint(200, 255)
