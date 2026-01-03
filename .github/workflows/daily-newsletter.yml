@@ -3,7 +3,7 @@ name: Daily Newsletter
 on:
   schedule:
     # 3:25 PM Pacific Standard Time => 23:25 UTC
-    - cron: '25 23 * * *'
+    - cron: '00 10 * * *'
   workflow_dispatch: {}
 
 jobs:
