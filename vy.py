@@ -44,9 +44,10 @@ weather_report = get_weather("90042")
 today = datetime.today()
 day_name = today.strftime('%A')
 
-terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", 
+terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", "beyonce",
          "climate change", "environmental justice", "beyonce", "sabrina carpenter", 
-         "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza"]
+         "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza",
+         "mental health", "self care", "wellness", "food justice"]
 
 sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine", 
            "The New Yorker", "Al Jazeera English", "Mondoweiss", "CNN", "Democracy Now!", "Slate Magazine", "Billboard"]
@@ -58,7 +59,6 @@ news_text = get_news(
     days_back=1,
     max_articles=5
 )
-
 
 sender_email = "tumendemberelbaji@gmail.com"
 receiver_email = "vy.tran27@gmail.com"

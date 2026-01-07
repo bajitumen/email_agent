@@ -31,71 +31,127 @@ def get_weather(zip_code):
         weather_data = response.json()
         max_temp = weather_data['daily']['temperature_2m_max'][0]
         min_temp = weather_data['daily']['temperature_2m_min'][0]
-        added_text = "Looks like the weather's perfect today!" if 70 <= max_temp <= 90 else "Bundle up or cool down!"
+        if max_temp < 70:
+            added_text = "It's chilly out there — bundle up!"
+        elif max_temp > 90:
+            added_text = "It's hot today — stay cool and hydrated!"
+        else:
+            added_text = "Looks like the weather's perfect today!"
         return f"High: {max_temp}°F, Low: {min_temp}°F. {added_text}"
     except requests.RequestException:
         return "Weather data unavailable."
+
+from datetime import datetime, timedelta
 
 def get_news(
     terms,
     sources,
     news_key,
+    logo_dev_token,
     days_back=1,
-    max_articles=5
+    max_articles=5,
+    logo_px=28,
 ):
+    """
+    Returns HTML with a square Logo.dev logo to the left of each headline.
+    Logos are resolved using a source-name → domain mapping.
+    """
 
     newsapi = NewsApiClient(api_key=news_key)
 
     query = " OR ".join(f'"{term}"' for term in terms)
 
-    from_date = (datetime.today() - timedelta(days=days_back)).strftime('%Y-%m-%d')
-    to_date = datetime.today().strftime('%Y-%m-%d')
+    from_date = (datetime.today() - timedelta(days=days_back)).strftime("%Y-%m-%d")
+    to_date = datetime.today().strftime("%Y-%m-%d")
 
     try:
         response = newsapi.get_everything(
             q=query,
             from_param=from_date,
             to=to_date,
-            language='en',
-            sort_by='relevancy'
+            language="en",
+            sort_by="relevancy",
         )
     except Exception:
         return "<p>News unavailable.</p>"
-    
+
     articles = [
         a for a in response.get("articles", [])
         if a.get("source", {}).get("name") in sources
     ]
 
+    def logo_dev_url(domain: str) -> str:
+        # request higher res for crisp rendering
+        size = max(64, logo_px * 2)
+        return f"https://img.logo.dev/{domain}?token={logo_dev_token}&size={size}&format=png"
+
     news_text = """
     <p>Here are some relevant <b>news articles</b> for you:</p>
     <table style="width: 100%; border-collapse: collapse; background-color: transparent;">
-        <tbody>
+      <tbody>
     """
 
-    for idx, article in enumerate(articles[:max_articles], start=1):
+    for article in articles[:max_articles]:
         url = article.get("url")
         title = article.get("title", "Untitled")
+        source_name = article.get("source", {}).get("name", "")
 
         if not url:
             continue
 
+        domain = SOURCE_DOMAIN_MAP.get(source_name)
+
+        if domain:
+            logo_html = f"""
+              <img
+                src="{logo_dev_url(domain)}"
+                alt="{source_name} logo"
+                width="{logo_px}"
+                height="{logo_px}"
+                style="
+                  display:block;
+                  width:{logo_px}px;
+                  height:{logo_px}px;
+                  border-radius:4px;
+                "
+                loading="lazy"
+                referrerpolicy="no-referrer"
+              />
+            """
+        else:
+            # fallback spacer keeps alignment clean
+            logo_html = f'<div style="width:{logo_px}px; height:{logo_px}px;"></div>'
+
         news_text += f"""
         <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px;">
-                <a href="{url}" style="text-decoration: none; color: #555;">
-                    {title}
-                </a>
-            </td>
+          <td style="
+            padding: 8px 10px 8px 0;
+            border-bottom: 1px solid #ddd;
+            width: {logo_px + 10}px;
+            vertical-align: top;
+          ">
+            {logo_html}
+          </td>
+          <td style="
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+            vertical-align: top;
+          ">
+            <a href="{url}" style="text-decoration: none; color: #555;">
+              {title}
+            </a>
+          </td>
         </tr>
         """
 
     news_text += """
-        </tbody>
+      </tbody>
     </table>
     """
 
     return news_text
+
 
 def send_email(sender_email, receiver_email, subject, body, smtp_server, smtp_port, login, password):
     message = MIMEMultipart("alternative")
