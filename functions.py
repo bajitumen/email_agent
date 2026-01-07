@@ -41,117 +41,92 @@ def get_weather(zip_code):
     except requests.RequestException:
         return "Weather data unavailable."
 
-from datetime import datetime, timedelta
-
 def get_news(
     terms,
     sources,
     news_key,
-    logo_dev_token,
     days_back=1,
-    max_articles=5,
-    logo_px=28,
+    max_articles=5
 ):
-    """
-    Returns HTML with a square Logo.dev logo to the left of each headline.
-    Logos are resolved using a source-name → domain mapping.
-    """
 
     newsapi = NewsApiClient(api_key=news_key)
 
     query = " OR ".join(f'"{term}"' for term in terms)
 
-    from_date = (datetime.today() - timedelta(days=days_back)).strftime("%Y-%m-%d")
-    to_date = datetime.today().strftime("%Y-%m-%d")
+    from_date = (datetime.today() - timedelta(days=days_back)).strftime('%Y-%m-%d')
+    to_date = datetime.today().strftime('%Y-%m-%d')
 
     try:
         response = newsapi.get_everything(
             q=query,
             from_param=from_date,
             to=to_date,
-            language="en",
-            sort_by="relevancy",
+            language='en',
+            sort_by='relevancy'
         )
     except Exception:
         return "<p>News unavailable.</p>"
+    
+    all_articles = response.get("articles", [])
 
+    # Try strict source name matching first
     articles = [
-        a for a in response.get("articles", [])
+        a for a in all_articles
         if a.get("source", {}).get("name") in sources
     ]
 
-    def logo_dev_url(domain: str) -> str:
-        # request higher res for crisp rendering
-        size = max(64, logo_px * 2)
-        return f"https://img.logo.dev/{domain}?token={logo_dev_token}&size={size}&format=png"
+    # If nothing matched, try a case-insensitive partial match (e.g., "Slate" vs "Slate Magazine")
+    if not articles:
+        normalized_sources = [s.lower().replace('magazine', '').strip() for s in sources]
+        matched = []
+        for a in all_articles:
+            name = (a.get("source", {}).get("name") or "").lower()
+            if any(ns in name or name in ns for ns in normalized_sources):
+                matched.append(a)
+        # preserve order and dedupe by URL
+        articles = list({a.get('url'): a for a in matched}.values())
+
+    # Fallback: if still no results, show top articles so the newsletter isn't empty
+    fallback_used = False
+    if not articles:
+        articles = all_articles[:max_articles]
+        fallback_used = True
 
     news_text = """
     <p>Here are some relevant <b>news articles</b> for you:</p>
-    <table style="width: 100%; border-collapse: collapse; background-color: transparent;">
-      <tbody>
     """
 
-    for article in articles[:max_articles]:
+    if fallback_used:
+        news_text += "<p><i>No articles found from preferred sources — showing top results instead.</i></p>"
+
+    news_text += """
+    <table style="width: 100%; border-collapse: collapse; background-color: transparent;">
+        <tbody>
+    """
+
+    for idx, article in enumerate(articles[:max_articles], start=1):
         url = article.get("url")
         title = article.get("title", "Untitled")
-        source_name = article.get("source", {}).get("name", "")
 
         if not url:
             continue
 
-        domain = SOURCE_DOMAIN_MAP.get(source_name)
-
-        if domain:
-            logo_html = f"""
-              <img
-                src="{logo_dev_url(domain)}"
-                alt="{source_name} logo"
-                width="{logo_px}"
-                height="{logo_px}"
-                style="
-                  display:block;
-                  width:{logo_px}px;
-                  height:{logo_px}px;
-                  border-radius:4px;
-                "
-                loading="lazy"
-                referrerpolicy="no-referrer"
-              />
-            """
-        else:
-            # fallback spacer keeps alignment clean
-            logo_html = f'<div style="width:{logo_px}px; height:{logo_px}px;"></div>'
-
         news_text += f"""
         <tr>
-          <td style="
-            padding: 8px 10px 8px 0;
-            border-bottom: 1px solid #ddd;
-            width: {logo_px + 10}px;
-            vertical-align: top;
-          ">
-            {logo_html}
-          </td>
-          <td style="
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-            font-size: 16px;
-            vertical-align: top;
-          ">
-            <a href="{url}" style="text-decoration: none; color: #555;">
-              {title}
-            </a>
-          </td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px;">
+                <a href="{url}" style="text-decoration: none; color: #555;">
+                    {title}
+                </a>
+            </td>
         </tr>
         """
 
     news_text += """
-      </tbody>
+        </tbody>
     </table>
     """
 
     return news_text
-
 
 def send_email(sender_email, receiver_email, subject, body, smtp_server, smtp_port, login, password):
     message = MIMEMultipart("alternative")
