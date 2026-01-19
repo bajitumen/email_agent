@@ -127,8 +127,10 @@ def get_news(
 
         news_text += f"""
         <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; width: 40px; vertical-align: middle;">
-                <img src="{logo_url}" alt="" style="width: 32px; height: 32px; border-radius: 4px; object-fit: contain;">
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; width: 56px; vertical-align: middle;">
+                <a href="{url}">
+                    <img src="{logo_url}" alt="" style="width: 48px; height: 48px; border-radius: 4px; object-fit: contain;">
+                </a>
             </td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px; vertical-align: middle;">
                 <a href="{url}" style="text-decoration: none; color: #555;">
