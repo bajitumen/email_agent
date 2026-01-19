@@ -116,7 +116,7 @@ def get_news(
             fallback_used = True
 
     news_text = """
-    <p>Here are some relevant <b>news articles</b> for you:</p>
+    <p>Here are today's top <b>news articles</b> for you:</p>
     """
 
     if fallback_used:

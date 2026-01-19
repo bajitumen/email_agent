@@ -35,7 +35,7 @@ day_name = today.strftime('%A')
 terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", "beyonce",
          "climate change", "environmental justice", "beyonce", "sabrina carpenter", 
          "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza",
-         "mental health", "self care", "wellness", "food justice", "music", "olivia dean",
+         "mental health", "self care", "wellness", "food justice", "olivia dean",
          "immigrant", "iran", "refugee"]
 
 sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine",
@@ -56,7 +56,7 @@ news_text = get_news(
 )
 
 sender_email = "tumendemberelbaji@gmail.com"
-receiver_email = "tumendemberelbaji@gmail.com"
+receiver_email = "vy.tran27@gmail.com"
 subject = f"{today.strftime('%-m/%-d/%Y')}: Vy Newsletter"
 
 r = random.randint(200, 255)
@@ -81,8 +81,8 @@ body = f"""
                 <div style="text-align: center; margin-top: 20px;">
                     <img src="{dog}" style="max-width: 400px; border-radius: 10px;">
                 </div>
-                <p style="font-size: 16px; color: #555555;">{horoscope}</p>
                 <p style="font-size: 16px; color: #555555; margin-left: 20px;">Love,<br>Baji &#x2764;</p>
+                <p style="font-size: 16px; color: #555555;">{horoscope}</p>
             </div>
         </div>
         </body>
