@@ -16,7 +16,7 @@ def get_horoscope(sign):
         response.raise_for_status()
         data = response.json()
         horoscope_text = data.get("data", {}).get("horoscope_data", "")
-        return f"♈ <b>Aries Horoscope:</b> {horoscope_text}"
+        return f"♈ <b>Today's Horoscope:</b> {horoscope_text}"
     except requests.RequestException:
         return "Horoscope unavailable."
 

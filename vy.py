@@ -35,7 +35,8 @@ day_name = today.strftime('%A')
 terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", "beyonce",
          "climate change", "environmental justice", "beyonce", "sabrina carpenter", 
          "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza",
-         "mental health", "self care", "wellness", "food justice"]
+         "mental health", "self care", "wellness", "food justice", "music", "olivia dean",
+         "immigrant", "iran", "refugee"]
 
 sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine",
            "The New Yorker", "Al Jazeera English", "Mondoweiss", "CNN", "Democracy Now!", "Slate Magazine", "Billboard",
