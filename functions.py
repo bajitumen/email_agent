@@ -38,10 +38,12 @@ def get_weather(zip_code):
 def get_news(
     terms,
     sources,
+    la_sources,
     news_key,
     logo_token,
     days_back=1,
-    max_articles=5
+    max_articles=5,
+    la_articles=2
 ):
 
     newsapi = NewsApiClient(api_key=news_key)
@@ -61,31 +63,45 @@ def get_news(
         )
     except Exception:
         return "<p>News unavailable.</p>"
-    
+
     all_articles = response.get("articles", [])
 
-    # Try strict source name matching first
-    articles = [
-        a for a in all_articles
-        if a.get("source", {}).get("name") in sources
-    ]
+    def match_sources(articles_list, source_list):
+        # Try strict source name matching first
+        matched = [
+            a for a in articles_list
+            if a.get("source", {}).get("name") in source_list
+        ]
+        # If nothing matched, try case-insensitive partial match
+        if not matched:
+            normalized = [s.lower().replace('magazine', '').strip() for s in source_list]
+            for a in articles_list:
+                name = (a.get("source", {}).get("name") or "").lower()
+                if any(ns in name or name in ns for ns in normalized):
+                    matched.append(a)
+            matched = list({a.get('url'): a for a in matched}.values())
+        return matched
 
-    # If nothing matched, try a case-insensitive partial match (e.g., "Slate" vs "Slate Magazine")
-    if not articles:
-        normalized_sources = [s.lower().replace('magazine', '').strip() for s in sources]
-        matched = []
-        for a in all_articles:
-            name = (a.get("source", {}).get("name") or "").lower()
-            if any(ns in name or name in ns for ns in normalized_sources):
-                matched.append(a)
-        # preserve order and dedupe by URL
-        articles = list({a.get('url'): a for a in matched}.values())
+    # Get LA articles
+    la_matched = match_sources(all_articles, la_sources)[:la_articles]
 
-    # Fallback: if still no results, show top articles so the newsletter isn't empty
+    # Get general articles (excluding any already used LA articles)
+    la_urls = {a.get('url') for a in la_matched}
+    remaining_articles = [a for a in all_articles if a.get('url') not in la_urls]
+    general_matched = match_sources(remaining_articles, sources)
+
+    # Combine: LA articles first, then general articles to fill remaining slots
+    general_needed = max_articles - len(la_matched)
+    articles = la_matched + general_matched[:general_needed]
+
+    # Fallback if we still don't have enough
     fallback_used = False
-    if not articles:
-        articles = all_articles[:max_articles]
-        fallback_used = True
+    if len(articles) < max_articles:
+        used_urls = {a.get('url') for a in articles}
+        fallback_articles = [a for a in all_articles if a.get('url') not in used_urls]
+        articles += fallback_articles[:max_articles - len(articles)]
+        if not la_matched and not general_matched:
+            fallback_used = True
 
     news_text = """
     <p>Here are some relevant <b>news articles</b> for you:</p>

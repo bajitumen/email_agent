@@ -33,20 +33,25 @@ terms = ["housing", "palestine", "ariana grande", "los angeles", "lebanon", "bey
          "chappell roan", "transportation", "urban planning", "transit justice", "queer", "gaza",
          "mental health", "self care", "wellness", "food justice"]
 
-sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine", 
-           "The New Yorker", "Al Jazeera English", "Mondoweiss", "CNN", "Democracy Now!", "Slate Magazine", "Billboard"]
+sources = ["NPR", "Eater", "The Atlantic", "Rolling Stone", "Time", "New York Magazine",
+           "The New Yorker", "Al Jazeera English", "Mondoweiss", "CNN", "Democracy Now!", "Slate Magazine", "Billboard",
+           "The Huffington Post", "The Washington Post", "Politico", "New York Magazine"]
+
+la_sources = ["Los Angeles Times", "LAist", "KTLA", "LA Magazine", "KCRW"]
 
 news_text = get_news(
     terms=terms,
     sources=sources,
+    la_sources=la_sources,
     news_key=news_key,
     logo_token=logo_token,
     days_back=1,
-    max_articles=5
+    max_articles=5,
+    la_articles=2
 )
 
 sender_email = "tumendemberelbaji@gmail.com"
-receiver_email = "vy.tran27@gmail.com"
+receiver_email = "tumendemberelbaji@gmail.com"
 subject = f"{today.strftime('%-m/%-d/%Y')}: Vy Newsletter"
 
 r = random.randint(200, 255)
