@@ -8,6 +8,18 @@ from newsapi import NewsApiClient
 import pgeocode
 from urllib.parse import urlparse
 
+def get_horoscope(sign):
+    endpoint = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily"
+    params = {"sign": sign, "day": "TODAY"}
+    try:
+        response = requests.get(endpoint, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        horoscope_text = data.get("data", {}).get("horoscope_data", "")
+        return f"♈ <b>Aries Horoscope:</b> {horoscope_text}"
+    except requests.RequestException:
+        return "Horoscope unavailable."
+
 def get_weather(zip_code):
     endpoint = "https://api.open-meteo.com/v1/forecast"
     nomi = pgeocode.Nominatim('us')
@@ -26,11 +38,11 @@ def get_weather(zip_code):
         max_temp = weather_data['daily']['temperature_2m_max'][0]
         min_temp = weather_data['daily']['temperature_2m_min'][0]
         if max_temp < 70:
-            added_text = "It's chilly out there — bundle up!"
+            added_text = "🥶 It's chilly out there — bundle up!"
         elif max_temp > 90:
-            added_text = "It's hot today — stay cool and hydrated!"
+            added_text = "🔥 It's hot today — stay cool and hydrated!"
         else:
-            added_text = "Looks like the weather's perfect today!"
+            added_text = "☀️ Looks like the weather's perfect today!"
         return f"High: {max_temp}°F, Low: {min_temp}°F. {added_text}"
     except requests.RequestException:
         return "Weather data unavailable."
@@ -129,7 +141,7 @@ def get_news(
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; width: 56px; vertical-align: middle;">
                 <a href="{url}">
-                    <img src="{logo_url}" alt="" style="width: 48px; height: 48px; border-radius: 4px; object-fit: contain;">
+                    <img src="{logo_url}" alt="" style="width: 42px; height: 48px; border-radius: 4px; object-fit: contain;">
                 </a>
             </td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px; vertical-align: middle;">

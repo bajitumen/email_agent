@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 import random
 import os
-from functions import get_weather, send_email, get_news
+from functions import get_weather, send_email, get_news, get_horoscope
 
 news_key = os.getenv("NEWS_API_KEY")
 logo_token = os.getenv("LOGO_DEV_TOKEN")
@@ -15,7 +15,10 @@ intros = {
     "Hmm... did we snugabug today?": 5,
     "It's gonna be a good day, I have a feeling.": 5,
     "Your horoscope today is that you're gonna slay.": 5,
-    "You are so loved, but especially today!": 5
+    "You are so loved, but especially today!": 5,
+    "So are you still in bed...er what?": 10,
+    "So how's the puppy doing?": 5,
+    "Sooo, do you mitch me already...er what?": 5
 }
 
 intros_list = list(intros.keys())
@@ -24,6 +27,7 @@ weights = list(intros.values())
 intro = random.choices(intros_list, weights=weights, k=1)[0]
 
 weather_report = get_weather("90042")
+horoscope = get_horoscope("aries")
 
 today = datetime.today()
 day_name = today.strftime('%A')
@@ -72,6 +76,7 @@ body = f"""
                 <p style="font-size: 16px; color: #555555;"><b>Dearest Vy,</b></p>
                 <p style="font-size: 16px; color: #555555;">{intro}</p>
                 <p style="font-size: 16px; color: #555555;">{weather_report}</p>
+                <p style="font-size: 16px; color: #555555;">{horoscope}</p>
                 <div style="font-size: 16px; color: #555555;">{news_text}</div>
                 <div style="text-align: center; margin-top: 20px;">
                     <img src="{dog}" style="max-width: 400px; border-radius: 10px;">
