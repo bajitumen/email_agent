@@ -22,7 +22,7 @@ jobs:
       - name: Run newsletter
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-          EVENTS_API_KEY: ${{ secrets.EVENTS_API_KEY }}
+          LOGO_DEV_TOKEN: ${{ secrets.LOGO_DEV_TOKEN }}
           SMTP_LOGIN: ${{ secrets.SMTP_LOGIN }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         run: python vy.py

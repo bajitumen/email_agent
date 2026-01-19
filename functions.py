@@ -1,18 +1,12 @@
 
-import pandas as pd
 import requests
 from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from bs4 import BeautifulSoup
-import json
-import re
-import random
-import time
 from newsapi import NewsApiClient
 import pgeocode
-import os
+from urllib.parse import urlparse
 
 def get_weather(zip_code):
     endpoint = "https://api.open-meteo.com/v1/forecast"
@@ -45,6 +39,7 @@ def get_news(
     terms,
     sources,
     news_key,
+    logo_token,
     days_back=1,
     max_articles=5
 ):
@@ -111,9 +106,15 @@ def get_news(
         if not url:
             continue
 
+        domain = urlparse(url).netloc.replace("www.", "")
+        logo_url = f"https://img.logo.dev/{domain}?token={logo_token}"
+
         news_text += f"""
         <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px;">
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; width: 40px; vertical-align: middle;">
+                <img src="{logo_url}" alt="" style="width: 32px; height: 32px; border-radius: 4px; object-fit: contain;">
+            </td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-size: 16px; vertical-align: middle;">
                 <a href="{url}" style="text-decoration: none; color: #555;">
                     {title}
                 </a>

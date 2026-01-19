@@ -1,27 +1,11 @@
-import pandas as pd
 import requests
-from datetime import datetime, timedelta
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from bs4 import BeautifulSoup
-import json
-import re
+from datetime import datetime
 import random
-import time
-from newsapi import NewsApiClient
-import pgeocode
 import os
-from dotenv import load_dotenv
 from functions import get_weather, send_email, get_news
 
-load_dotenv()
 news_key = os.getenv("NEWS_API_KEY")
-events_key = os.getenv("EVENTS_API_KEY")
-if news_key:
-    news_key = news_key.strip()
-if events_key:
-    events_key = events_key.strip()
+logo_token = os.getenv("LOGO_DEV_TOKEN")
 
 intros = {
     "Huzzah, another day begins!": 10,
@@ -56,6 +40,7 @@ news_text = get_news(
     terms=terms,
     sources=sources,
     news_key=news_key,
+    logo_token=logo_token,
     days_back=1,
     max_articles=5
 )
