@@ -76,11 +76,11 @@ body = f"""
                 <p style="font-size: 16px; color: #555555;"><b>Dearest Vy,</b></p>
                 <p style="font-size: 16px; color: #555555;">{intro}</p>
                 <p style="font-size: 16px; color: #555555;">{weather_report}</p>
-                <p style="font-size: 16px; color: #555555;">{horoscope}</p>
                 <div style="font-size: 16px; color: #555555;">{news_text}</div>
                 <div style="text-align: center; margin-top: 20px;">
                     <img src="{dog}" style="max-width: 400px; border-radius: 10px;">
                 </div>
+                <p style="font-size: 16px; color: #555555;">{horoscope}</p>
                 <p style="font-size: 16px; color: #555555; margin-left: 20px;">Love,<br>Baji &#x2764;</p>
             </div>
         </div>
