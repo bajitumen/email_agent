@@ -15,8 +15,12 @@ def get_horoscope(sign):
         response = requests.get(endpoint, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
-        horoscope_text = data.get("data", {}).get("horoscope_data", "")
-        return f"♈ <b>Today's Horoscope:</b> {horoscope_text}"
+        horoscope_text = data.get("data", {}).get("horoscope", "")
+        return (
+            f'<div style="max-width: 400px; margin: 0 auto; font-size: 14px; color: #555555; text-align: center;">'
+            f'<b>Today\'s Horoscope:</b><br>{horoscope_text}'
+            f'</div>'
+        )
     except requests.RequestException:
         return "Horoscope unavailable."
 
